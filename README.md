@@ -10,7 +10,7 @@ stakeholders
 functions
 	product management - kasun
 	payment methods / management - akalanka
-	research document management - eshan	user management - kanchila	inquiry management (call center like function) - sasitha
+	research document management - eshan	user management - kanchila	Funding service - sasitha
 
 
 
