@@ -22,7 +22,9 @@ stakeholders and their activities
 
 
 
-functions
+functions
+	
+	Authentication Service - akalanka
 	product management (service) - kasun
 	payment methods / management (service) - akalanka
 	research management (documents) (service) - eshan	user management (service) - kanchila	Funding service (service) - sasitha
