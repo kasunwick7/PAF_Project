@@ -22,31 +22,39 @@ stakeholders and their activities
 
 
 
-functions
+functions / services 
 	
-	Authentication Service - akalanka
-	product management (service) - kasun
-	payment methods / management (service) - akalanka
-	research management (documents) (service) - eshan	user management (service) - kanchila	Funding service (service) - sasitha
+	authentication-service - akalanka
+	product-management-service - kasun
+	payment-management-service - akalanka
+	research-management-service - eshan	user-management-service - kanchila	funding-service - sasitha
 
 
 databases (* all characters should be lowercase and use `_` for spaces *)
 
-	product management (service) - DB
-		product(products_id (PK) , name , description , quantity , price , added_date )
-		product_sold(products_id (FK PK) , buyer_id , sold_date )
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DB user name - paf_user
+DB password - ^paf_user_pw_000
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	payment methods / management (service) - DB
-		shopping_cart( cart_id , product_id , quantity )
+	paf_product_management - DB
+		products(products_id (PK INT AI) , name , description , quantity , price , added_date )
+		products_sold(products_id (FK PK) , buyer_id , sold_date )
 
-	research management (documents) (service) - DB
-		research(research_id , topic , estimated_cost , details , published_date )
+	paf_payment_management - DB
+		shopping_cart( user_id (PK) , product_id , quantity )
+
+	paf_research_management - DB
+		researchs(research_id (PK) , topic , estimated_cost , details , published_date )
 			
-	user management (service) - DB
-		user(username , password , email , fname , lname , dob , address , tp_number ,type)
+	paf_user_management - DB
+		users(user_id(PK AI) , username , password , user_level ,email , fname , lname , dob , address , tp_number) user levels {10-admin,20-buyers,30-funding bodies,40-researchers }
 		
-	Funding service (service) - DB
+	paf_funding_management- DB
 		received_funds(fund_id (PK) , research_id (FK) , finding_body_id , amount )
+
+	paf_authentication_management - memory DB
+		logged_in_users(user_id (PK) , timestap , user_level) user levels {10-admin,20-buyers,30-funding bodies,40-researchers }
 
 
 	
