@@ -44,5 +44,37 @@ public class PaymentManagementModel {
 
 		return true;
 	}
+	
+	public String removeItemFromCart(int user_id , int product_id) {
+		String output = "error";
+		try {
+			Connection con = connect();
+			if (con == null) {
+				return "Error while connecting to the database";
+			}
+			// create a prepared statement
+			String query = " delete FROM shopping_cart where user_id = ? and product_id = ? ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			// binding values
+
+			preparedStmt.setInt(1, user_id);
+			preparedStmt.setInt(2, product_id);
+			// execute the statement
+
+			int result = preparedStmt.executeUpdate();
+
+			if (result >= 1) {
+				output = "done";
+
+			}
+			con.close();
+
+		} catch (Exception e) {
+			output = "Error while prosessing the request.";
+			System.err.println(e.getMessage());
+		}
+		return output;
+	}
+
 
 }
