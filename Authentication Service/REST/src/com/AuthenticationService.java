@@ -19,7 +19,7 @@ public class AuthenticationService {
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String uservalidation(String data) {
+	public String newLoginRequest(String data) {
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
 		String username = itemObject.get("username").getAsString();
 		String password = itemObject.get("password").getAsString();
