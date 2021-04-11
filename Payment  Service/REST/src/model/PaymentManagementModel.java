@@ -3,6 +3,10 @@ package model;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public class PaymentManagementModel {
 	private Connection connect() {
@@ -44,8 +48,8 @@ public class PaymentManagementModel {
 
 		return true;
 	}
-	
-	public String removeItemFromCart(int user_id , int product_id) {
+
+	public String removeItemFromCart(int user_id, int product_id) {
 		String output = "error";
 		try {
 			Connection con = connect();
@@ -76,5 +80,43 @@ public class PaymentManagementModel {
 		return output;
 	}
 
+	public String returnCartDetails(int user_id) {
+		JsonObject cartData = new JsonObject();
+
+		try {
+
+			Connection con = connect();
+			if (con == null) {
+				return cartData.toString();
+			}
+			// create a prepared statement
+			String query = " select * from shopping_cart where user_id = ? ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			// binding values
+
+			preparedStmt.setInt(1, user_id);
+			ResultSet rs = preparedStmt.executeQuery();
+
+			JsonArray array = new JsonArray();
+			JsonObject innerItems = new JsonObject();
+			while (rs.next()) {
+
+				innerItems.addProperty("product_id", rs.getInt(2));
+				innerItems.addProperty("quantity", rs.getInt(3));
+				array.add(innerItems);
+
+			}
+			cartData.add("items", array);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			cartData.addProperty("status", "error");
+			return cartData.toString();
+
+		}
+
+		return cartData.toString();
+	}
 
 }
