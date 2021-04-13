@@ -177,4 +177,70 @@ public class AuthenticationModel {
 		return output;
 	}
 
+	public String credentialUpdate(int id, String username, String password) {
+		String output = "error";
+		try {
+			Connection con = connect();
+			if (con == null) {
+				return "Error while connecting to the database";
+			}
+
+			if (output.equals("invalid")) {
+				return output;
+			}
+
+			// create a prepared statement for update un and pw
+			String query = " update user_credentials set username = ? , password = ? where user_id = ? ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			// binding values
+
+			preparedStmt.setInt(3, id);
+			preparedStmt.setString(1, username);
+			preparedStmt.setString(2, password);
+
+			// execute the statement
+
+			int result = preparedStmt.executeUpdate();
+
+			if (result >= 1) {
+				output = "done";
+
+			}
+			con.close();
+
+		} catch (Exception e) {
+			output = "Error while prosessing the request.";
+			System.err.println(e.getMessage());
+		}
+		return output;
+	}
+
+	public String addUser(int id, String username, String password) {
+		String output = "error";
+
+		try {
+			Connection con = connect();
+			if (con == null) {
+				return "Error while connecting to the database";
+			}
+
+			String query = " insert into user_credentials values(?,?,?) ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			preparedStmt.setInt(1, id);
+			preparedStmt.setString(2, username);
+			preparedStmt.setString(3, password);
+
+			// execute the statement
+
+			int result = preparedStmt.executeUpdate();
+			if (result > 0) {
+				output = "done";
+			}
+		} catch (Exception e) {
+			output = "Exception";
+		}
+
+		return output;
+	}
+
 }
