@@ -54,7 +54,7 @@ DB password - ^paf_user_pw_000
 		received_funds(fund_id (PK) , research_id (FK) , finding_body_id , amount )
 
 	paf_security_management - memory DB
-		logged_in_users(user_id (PK) , timestap , user_level) user levels {10-admin,20-buyers,30-funding bodies,40-researchers } - *memory DB*
+		logged_in_users(user_id (PK) , auth_key , timestap )  - *memory DB*
 		user_credentials(user_id(PK) , username , password)
 
 	
