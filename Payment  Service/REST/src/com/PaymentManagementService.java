@@ -1,5 +1,7 @@
 package com;
 
+import com.RequestValidator;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,13 +26,16 @@ public class PaymentManagementService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String addItem(String data) {
 		JsonObject result = new JsonObject();
-		result.addProperty("status", "");
+		result.addProperty("status", "error");
 		int userId = 0;
 		int productId = 0;
 		int quantity = 0;
 
 		try {
 			JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
+			if (!RequestValidator.validate(itemObject.get("key").getAsString())) {
+				return result.toString();
+			}
 			if (itemObject.has("user_id")) {
 				userId = itemObject.get("user_id").getAsInt();
 				productId = itemObject.get("product_id").getAsInt();
