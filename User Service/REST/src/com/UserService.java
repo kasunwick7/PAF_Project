@@ -69,7 +69,7 @@ public String deleteUser(String itemData)
  Document doc = Jsoup.parse(itemData, "", Parser.xmlParser());
 
 //Read the value from the element <itemID>
- String userid = doc.select("itemID").text();
+ String userid = doc.select("user_id").text();
  String output = userObj.deleteUser(userid);
 return output;
 }
