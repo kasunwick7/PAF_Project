@@ -1,5 +1,7 @@
 package model;
 import java.sql.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 public class User
 { //A common method to connect to the DB
 private Connection connect()
@@ -161,4 +163,43 @@ public String updateUser(int user_id,int user_level, String email, String fname,
 	 }
 	 return output;
 	 }
-	}
+	
+	public String returnUserLevel(int user_id) {
+		JsonObject UserData = new JsonObject();
+
+		try {
+
+			Connection con = connect();
+			if (con == null) {
+				return UserData.toString();
+			}
+			// create a prepared statement
+			String query = " select * from users where user_id = ? ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			// binding values
+
+			preparedStmt.setInt(1, user_id);
+			ResultSet rs = preparedStmt.executeQuery();
+
+			JsonArray array = new JsonArray();
+			JsonObject innerUsers = new JsonObject();
+			while (rs.next()) {
+
+				innerUsers.addProperty("product_id", rs.getInt(1));
+				innerUsers.addProperty("quantity", rs.getInt(2));
+				array.add(innerUsers);
+
+			}
+			UserData.add("users", array);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			UserData.addProperty("status", "error");
+			return UserData.toString();
+
+		}
+
+		return UserData.toString();
+	}	
+}

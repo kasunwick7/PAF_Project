@@ -74,6 +74,24 @@ public String deleteUser(String itemData)
 return output;
 }
 
+@GET
+@Path("userLevel/{user_id}")
+@Consumes(MediaType.TEXT_PLAIN)
+@Produces(MediaType.APPLICATION_JSON)
+public String getUserLevel(@DefaultValue("0") @QueryParam("user_id") Integer user,
+		@DefaultValue("") @QueryParam("key") String key) {
+	// request validation
+	if (!RequestValidator.validate(key)) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error_unauthorized");
+		return result.toString();
+	}
+
+	String returnValue = "";
+	returnValue = userObj.returnUserLevel(user);
+	return returnValue;
+}
+
 }
 
 
