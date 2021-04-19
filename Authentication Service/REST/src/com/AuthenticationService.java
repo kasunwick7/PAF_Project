@@ -26,8 +26,7 @@ public class AuthenticationService {
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
 		String username = itemObject.get("username").getAsString();
 		String password = itemObject.get("password").getAsString();
-		String status[] = auth.userValidation(username, password);
-		return "{validation_status:" + status[0] + "," + "key:" + status[1] + "}";
+		return auth.userValidation(username, password);
 	}
 
 	// -----------------------------------------
