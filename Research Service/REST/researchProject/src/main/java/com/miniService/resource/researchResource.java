@@ -15,14 +15,14 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-@Path("research")
+@Path("/research")
 public class researchResource 
 {
 	
 	researchProjectRepository rpRepo = new researchProjectRepository();
 	
 	@GET
-	@Path("getResearchProjects")
+	@Path("/getResearchProjects")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public List<ResearchProject> getAllresearchProjects()
 	{
@@ -32,7 +32,7 @@ public class researchResource
 	}
 	
 	@GET
-	@Path("getResearchProject/{researchID}")
+	@Path("/getResearchProject/{researchID}")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public ResearchProject getresearchProjects(@PathParam("researchID") int researchID)
 	{
@@ -42,7 +42,7 @@ public class researchResource
 	}
 	
 	@GET
-	@Path("searchResearchProjects/{researchName}")
+	@Path("/searchResearchProjects/{researchName}")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public List<ResearchProject> searchResearch(@PathParam("researchName") String researchName)
 	{
@@ -52,7 +52,7 @@ public class researchResource
 	}
 	
 	@GET
-	@Path("searchResearchProjects/{researchCategory}")
+	@Path("/searchResearchProjects/{researchCategory}")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public List<ResearchProject> searchResearchByCategory(@PathParam("researchCategory") String researchCategory)
 	{
@@ -62,7 +62,7 @@ public class researchResource
 	}
 	
 	@POST
-	@Path("insertresearchProject")
+	@Path("/insertresearchProject")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public ResearchProject addResearchProject(ResearchProject rp1)
 	{
@@ -71,7 +71,7 @@ public class researchResource
 	}
 	
 	@PUT
-	@Path("updateresearchProject")
+	@Path("/updateresearchProject")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public ResearchProject updateResearch(ResearchProject rp1)
 	{
@@ -89,7 +89,7 @@ public class researchResource
 	}
 	
 	@DELETE
-	@Path("deleteresearchProject/{researchID}")
+	@Path("/deleteresearchProject/{researchID}")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public ResearchProject deleteResearch(@PathParam("researchID") int researchID)
 	{
