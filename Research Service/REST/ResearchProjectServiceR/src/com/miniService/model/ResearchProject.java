@@ -15,8 +15,8 @@ public class ResearchProject {
 		Connection con = null;
 		
 		String url = "jdbc.mysql://127.0.0.1:3306/research_db";
-		String username = "root";
-		String password = "lekamge1998";
+		String username = "^paf_user_pw_000";
+		String password = "paf_user";
 		
 		try {
 			
