@@ -16,7 +16,7 @@ public class Funds
 			Class.forName("com.mysql.jdbc.Driver"); 
  
 			//Provide the correct details: DBServer/DBName, username, password 
-			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paf_project", "root", "Sasitha@2020"); 
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paf_fund_management", "paf_user", "^paf_user_pw_000"); 
 		} 
 		catch (Exception e) 
 		{e.printStackTrace();} 
@@ -24,39 +24,42 @@ public class Funds
 	} 
 	
 	
-	public String insertItem(String funderName, String amount, String fundingDate,String fundStatus) 
+	public boolean addFundPayment(int researchID, String funderName, String amount, String fundingDate,String fundStatus) 
 	{ 
-		String output = ""; 
+//		String output = ""; 
 		try
 		{ 
 			Connection con = connect(); 
 			if (con == null) 
-			{return "Error while connecting to the database for inserting."; } 
+			{return false; } 
 			// create a prepared statement
-			String query = " insert into funds (`fundID`,`funderName`,`amount`,`fundingDate`,`fundStatus`)"
-					+ " values (?, ?, ? ,? ,?)"; 
+			String query = " insert into funds (`fundID`,`researchID`,`funderName`,`amount`,`fundingDate`,`fundStatus`)"
+					+ " values (?, ?, ?, ?, ?, ?)"; 
+//			(`researchID`,`funderName`,`amount`,`fundingDate`,`fundStatus`)
 			PreparedStatement preparedStmt = con.prepareStatement(query); 
 			// binding values
-			preparedStmt.setInt(1, 0); 
-			preparedStmt.setString(2, funderName); 
-			preparedStmt.setDouble(3, Double.parseDouble(amount)); 
-			preparedStmt.setString(4, fundingDate);
-			preparedStmt.setString(5, fundStatus); 
+			preparedStmt.setInt(1, 0);
+			preparedStmt.setInt(2, researchID); 
+			preparedStmt.setString(3, funderName); 
+			preparedStmt.setDouble(4, Double.parseDouble(amount)); 
+			preparedStmt.setString(5, fundingDate);
+			preparedStmt.setString(6, fundStatus); 
 			// execute the statement3
 			preparedStmt.execute(); 
 			con.close(); 
-			output = "Inserted successfully"; 
+//			output = "Inserted successfully"; 
 		} 
 		catch (Exception e) 
 		{ 
-			output = "Error while inserting the fund details."; 
+//			output = "Error while inserting the fund details."; 
 			System.err.println(e.getMessage()); 
+			return false;
 		} 
-		return output; 
+		return true; 
 	} 
 	
 	
-	public String readItems() 
+	public String readFundPayment() 
 	{ 
 		String output = ""; 
 		try
@@ -65,9 +68,11 @@ public class Funds
 			if (con == null) 
 			{return "Error while connecting to the database for reading."; } 
 			// Prepare the html table to be displayed
-			output = "<table border='1'><tr><th>Item Code</th><th>Item Name</th>" +
-					"<th>Item Price</th>" + 
-					"<th>Item Description</th>" +
+			output = "<table border='1'><tr><th>fund ID</th><th>Research ID</th>" +
+					"<th>funder name</th>" + 
+					"<th>Amount</th>" +
+					"<th>funing date</th>" +
+					"<th>fund status</th>" +
 					"<th>Update</th><th>Remove</th></tr>"; 
  
 			String query = "select * from funds"; 
@@ -77,12 +82,14 @@ public class Funds
 			while (rs.next()) 
 			{ 
 				String fundID = Integer.toString(rs.getInt("fundID")); 
+				String researchID = Integer.toString(rs.getInt("researchID")); 
 				String funderName = rs.getString("funderName"); 
 				String amount = Double.toString(rs.getDouble("amount")); 
 				String fundingDate = rs.getString("fundingDate"); 
 				String fundStatus = rs.getString("fundStatus"); 
 				// Add into the html table
 				output += "<tr><td>" + fundID + "</td>"; 
+				output += "<tr><td>" + researchID + "</td>"; 
 				output += "<td>" + funderName + "</td>"; 
 				output += "<td>" + amount + "</td>"; 
 				output += "<td>" + fundingDate + "</td>"; 
@@ -91,7 +98,7 @@ public class Funds
 				output += "<td><input name='btnUpdate' type='button' value='Update' class='btn btn-secondary'></td>"
 						+ "<td><form method='post' action='items.jsp'>"
 						+ "<input name='btnRemove' type='submit' value='Remove' class='btn btn-danger'>"
-						+ "<input name='itemID' type='hidden' value='" + fundID 
+						+ "<input name='fundID' type='hidden' value='" + fundID 
 						+ "'>" + "</form></td></tr>"; 
 			} 
 			con.close(); 
@@ -109,7 +116,7 @@ public class Funds
 		return output;
 		 
 	} 
-	public String updateItem(String fundID, String funderName, String amount, String fundingDate, String fundStatus)
+	public String updateFundPayment(String fundID, int researchID, String funderName, String amount, String fundingDate, String fundStatus)
 	{ 
 		String output = ""; 
 		try
@@ -118,14 +125,15 @@ public class Funds
 			if (con == null) 
 			{return "Error while connecting to the database for updating."; } 
 			// create a prepared statement
-			String query = "UPDATE funds SET funderName=?,amount=?,fundingDate=?,fundStatus=? WHERE fundID=?"; 
+			String query = "UPDATE funds SET researchID=?,funderName=?,amount=?,fundingDate=?,fundStatus=? WHERE fundID=?"; 
 			PreparedStatement preparedStmt = con.prepareStatement(query); 
 			// binding values
-			preparedStmt.setString(1, funderName); 
-			preparedStmt.setDouble(2,Double.parseDouble(amount)); 
-			preparedStmt.setString(3,fundingDate); 
-			preparedStmt.setString(4, fundStatus); 
-			preparedStmt.setInt(5, Integer.parseInt(fundID)); 
+			preparedStmt.setInt(1, researchID);
+			preparedStmt.setString(2, funderName); 
+			preparedStmt.setDouble(3,Double.parseDouble(amount)); 
+			preparedStmt.setString(4,fundingDate); 
+			preparedStmt.setString(5, fundStatus); 
+			preparedStmt.setInt(6, Integer.parseInt(fundID)); 
 			// execute the statement
 			preparedStmt.execute(); 
 			con.close(); 
@@ -140,7 +148,7 @@ public class Funds
 	} 
 	
 	
-	public String deleteItem(String fundID) 
+	public String deleteFundPayment(String fundID) 
 	{ 
 		String output = ""; 
 		try
