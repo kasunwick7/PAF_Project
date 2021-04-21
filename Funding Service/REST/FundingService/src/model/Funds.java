@@ -73,7 +73,7 @@ public class Funds
 					"<th>Amount</th>" +
 					"<th>funing date</th>" +
 					"<th>fund status</th>" +
-					"<th>Update</th><th>Remove</th></tr>"; 
+					"</tr>"; 
  
 			String query = "select * from funds"; 
 			Statement stmt = con.createStatement(); 
