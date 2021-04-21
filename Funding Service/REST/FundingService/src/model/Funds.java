@@ -67,7 +67,7 @@ public class Funds
 			Connection con = connect(); 
 			if (con == null) 
 			{return "Error while connecting to the database for reading."; } 
-			// Prepare the html table to be displayed
+			
 			output = "<table border='1'><tr><th>fund ID</th><th>Research ID</th>" +
 					"<th>funder name</th>" + 
 					"<th>Amount</th>" +
@@ -87,7 +87,7 @@ public class Funds
 				String amount = Double.toString(rs.getDouble("amount")); 
 				String fundingDate = rs.getString("fundingDate"); 
 				String fundStatus = rs.getString("fundStatus"); 
-				// Add into the html table
+				
 				output += "<tr><td>" + fundID + "</td>"; 
 				output += "<tr><td>" + researchID + "</td>"; 
 				output += "<td>" + funderName + "</td>"; 
@@ -102,7 +102,7 @@ public class Funds
 						+ "'>" + "</form></td></tr>"; 
 			} 
 			con.close(); 
-			// Complete the html table
+		
 			output += "</table>"; 
 			
 			
