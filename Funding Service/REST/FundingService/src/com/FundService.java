@@ -5,12 +5,14 @@ import java.sql.PreparedStatement;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.google.gson.*;
@@ -24,14 +26,6 @@ public class FundService {
 	
 	Funds funds1 = new Funds();
 
-	@GET
-	@Path("/") 
-	@Produces(MediaType.APPLICATION_JSON) 
-	public String readFundPayment() 
-	{ 
-	 return funds1.readFundPayment(); 
-	}
-	//
 	
 	@POST
 	@Path("/")
@@ -47,7 +41,7 @@ public class FundService {
 		String amount;
 		String fundingDate;
 		String fundStatus;
-
+		
 		try {
 			JsonObject fundObject = new JsonParser().parse(fundData).getAsJsonObject();
 			// request validation
@@ -140,8 +134,27 @@ public class FundService {
 
 		return "{status:" + returnValue + "}";
 	}
+	
+	@GET
+	@Path("/")
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+	public String getAllresearchProjects()
+	{
+		return funds1.getAllFundDetails();
+	}
 
 	
-	
+	@GET
+	@Path("/fundDetail")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String readItem(String fundData) {
+		// request validation
+		JsonObject fundObj = new JsonParser().parse(fundData).getAsJsonObject();
+
+		int fundID = fundObj.get("fundID").getAsInt();
+			
+		return funds1.getFundDetails(fundID);
+	}
+
 
 }
