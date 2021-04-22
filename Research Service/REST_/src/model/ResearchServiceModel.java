@@ -137,17 +137,32 @@ public String getresearchProjects(String researchData)//(@DefaultValue("0") @Que
 @GET
 @Path("/searchResearchProjects")
 @Produces(MediaType.APPLICATION_JSON)
-public String searchResearch(@DefaultValue("") @QueryParam("researchName") String research)//@DefaultValue("") @QueryParam("key") String key)
+public String searchResearch(@DefaultValue("") @QueryParam("researchName") String research, @DefaultValue("") @QueryParam("key") String key)//(String researchData)
 {
+	// request validation
+			if (!RequestValidator.validate(key)) {
+				JsonObject result = new JsonObject();
+				result.addProperty("status", "error_unauthorized");
+				return result.toString();
+			}
+	
+	//JsonObject researhObject = new JsonParser().parse(researchData).getAsJsonObject();
+	
+	//String researchName = researhObject.get("researchName").getAsString();
+	
 	return researchObj.searchResearchProjects(research);
 }
 
 @GET
 @Path("/searchResearchProjectsCat")
 @Produces(MediaType.APPLICATION_JSON)
-public String searchResearchByCategory(@DefaultValue("") @QueryParam("researchCategory") String research)//@DefaultValue("") @QueryParam("key") String key)
+public String searchResearchByCategory(String researchData)//(@DefaultValue("") @QueryParam("researchCategory") String research, @DefaultValue("") @QueryParam("key") String key)
 {
-	return researchObj.searchResearchProjectsByCategory(research);
+	JsonObject researhObject = new JsonParser().parse(researchData).getAsJsonObject();
+	
+	String researchCategory = researhObject.get("researchCategory").getAsString();
+	
+	return researchObj.searchResearchProjectsByCategory(researchCategory);
 }
 
 @PUT

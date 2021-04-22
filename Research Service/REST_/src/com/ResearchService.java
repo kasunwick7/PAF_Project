@@ -74,8 +74,6 @@ public String getAllResearchProjects()
 {
 	JsonObject researchDetails = new JsonObject();
 	
-	String output = "error";
-	
 	try {
 		
 		Connection con = connect();
@@ -86,13 +84,14 @@ public String getAllResearchProjects()
 		
 		String readSql = "SELECT * FROM researchprojects_tb";
 		PreparedStatement statement = con.prepareStatement(readSql);
-		ResultSet results = statement.executeQuery(readSql);
+		ResultSet results = statement.executeQuery();
 		
 		JsonArray researchArray = new JsonArray();
-		JsonObject researchObject = new JsonObject();
 		
 		while(results.next())
 		{
+			JsonObject researchObject = new JsonObject();
+			
 			researchObject.addProperty("researchID", results.getInt(1));
 			researchObject.addProperty("researchName", results.getString(2));
 			researchObject.addProperty("researcherId", results.getInt(3));
@@ -101,13 +100,13 @@ public String getAllResearchProjects()
 			researchObject.addProperty("researchDescription", results.getString(6));
 			researchObject.addProperty("researchCost", results.getFloat(7));
 			researchObject.addProperty("researchDuration", results.getInt(8));
-			researchObject.addProperty("startDate", results.getString(9));
+			researchObject.addProperty("startDate", results.getString(9));	
+			
 			researchArray.add(researchObject);
+			
 		}
 		
 		researchDetails.add("resarches", researchArray);
-		
-		con.close();
 		
 	}catch(Exception e)
 	{
@@ -142,23 +141,18 @@ public String getResearchProject(int researchID)
 		statement.setInt(1, researchID);
 		ResultSet results = statement.executeQuery();
 		
-		JsonArray researchArray = new JsonArray();
-		JsonObject researchObject = new JsonObject();
-		
-		while(results.next())
+		if(results.next())
 		{
-			researchObject.addProperty("researchName", results.getString(2));
-			researchObject.addProperty("researcherId", results.getInt(3));
-			researchObject.addProperty("researcherName", results.getString(4));
-			researchObject.addProperty("researchCategory", results.getString(5));
-			researchObject.addProperty("researchDescription", results.getString(6));
-			researchObject.addProperty("researchCost", results.getFloat(7));
-			researchObject.addProperty("researchDuration", results.getInt(8));
-			researchObject.addProperty("startDate", results.getString(9));
-			researchArray.add(researchObject);
+			researchDetails.addProperty("researchName", results.getString(2));
+			researchDetails.addProperty("researcherId", results.getInt(3));
+			researchDetails.addProperty("researcherName", results.getString(4));
+			researchDetails.addProperty("researchCategory", results.getString(5));
+			researchDetails.addProperty("researchDescription", results.getString(6));
+			researchDetails.addProperty("researchCost", results.getFloat(7));
+			researchDetails.addProperty("researchDuration", results.getInt(8));
+			researchDetails.addProperty("startDate", results.getString(9));
+
 		}
-		
-		researchDetails.add("resarches", researchArray);
 		
 		con.close();
 		
@@ -188,16 +182,20 @@ public String searchResearchProjects(String researchName)
 			return researchDetails.toString();
 		}
 		
-		String readSql = "SELECT * FROM researchprojects_tb WHERE researchName LIKE '%"+researchName+"%'";
+		String readSql = "SELECT * FROM researchprojects_tb WHERE researchName LIKE CONCAT( '%',?,'%')";
 		PreparedStatement statement = con.prepareStatement(readSql);
+		
+		statement.setString(1, researchName);
 		
 		ResultSet results = statement.executeQuery();
 		
 		JsonArray researchArray = new JsonArray();
-		JsonObject researchObject = new JsonObject();
+		
 		
 		while(results.next())
 		{
+			JsonObject researchObject = new JsonObject();
+			
 			researchObject.addProperty("researchName", results.getString(2));
 			researchObject.addProperty("researcherId", results.getInt(3));
 			researchObject.addProperty("researcherName", results.getString(4));
@@ -206,6 +204,7 @@ public String searchResearchProjects(String researchName)
 			researchObject.addProperty("researchCost", results.getFloat(7));
 			researchObject.addProperty("researchDuration", results.getInt(8));
 			researchObject.addProperty("startDate", results.getString(9));
+			
 			researchArray.add(researchObject);
 		}
 		
@@ -242,13 +241,17 @@ public String searchResearchProjectsByCategory(String researchCategory)
 		String readSql = "SELECT * FROM researchprojects_tb WHERE researchCategory = ?";
 		PreparedStatement statement = con.prepareStatement(readSql);
 		
+		statement.setString(1, researchCategory);
+		
 		ResultSet results = statement.executeQuery();
 		
 		JsonArray researchArray = new JsonArray();
-		JsonObject researchObject = new JsonObject();
+		
 		
 		while(results.next())
 		{
+			JsonObject researchObject = new JsonObject();
+			
 			researchObject.addProperty("researchName", results.getString(2));
 			researchObject.addProperty("researcherId", results.getInt(3));
 			researchObject.addProperty("researcherName", results.getString(4));
@@ -289,7 +292,7 @@ public String updateResearchProject(int researchID, String researchName, int res
 			return "Error while connecting to the database for updating";
 		}
 		
-		String insertSql = "UPDATE researchprojects_tb SET 'researchName' = ?, 'researcherId' = ?, 'researcherName' = ?, 'researchCategory' = ?, 'researchDescription' = ?, 'researchCost' = ?, 'researchDuration' = ?, 'startDate' = ? WHERE 'researchID' = ?";
+		String insertSql = "UPDATE researchprojects_tb SET researchName = ?, researcherId = ?, researcherName = ?, researchCategory = ?, researchDescription = ?, researchCost = ?, researchDuration = ?, startDate = ? WHERE researchID = ?";
 		
 		PreparedStatement statement = con.prepareStatement(insertSql);
 		
@@ -339,13 +342,12 @@ public String deleteResearchProject(int researchID)
 			output = "Deleted Successfully";
 			
 	}
-		catch(Exception e)
-		{
-			
-			output = "Error while Deleting";
-			System.out.println(e);
+	catch(Exception e)
+	{
+		output = "Error while Deleting";
+		System.out.println(e);
 		
-		}
+	}
 	
 	return output;
 	
