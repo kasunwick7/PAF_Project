@@ -1,5 +1,4 @@
 package com;
-
 import model.User;
 //For REST Service
 import javax.ws.rs.*;
@@ -10,79 +9,154 @@ import com.google.gson.*;
 import org.jsoup.*;
 import org.jsoup.parser.*;
 import org.jsoup.nodes.Document;
-
 @Path("/User")
-public class UserService {
-	User userObj = new User();
-
-	@GET
-	@Path("/")
-	@Produces(MediaType.TEXT_HTML)
-	public String readItems() {
-		return userObj.readUsers();
+public class UserService
+{
+ User user = new User();
+@GET
+@Path("/")
+@Consumes(MediaType.TEXT_PLAIN)
+@Produces(MediaType.APPLICATION_JSON)
+// read cart
+public String ReadUsers(@DefaultValue("0") @QueryParam("user_id") Integer userID,
+		@DefaultValue("") @QueryParam("key") String key) {
+	// request validation
+	if (!RequestValidator.validate(key)) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error_unauthorized");
+		return result.toString();
 	}
 
-	@POST
-	@Path("/")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String insertUser(@FormParam("user_level") int user_level, @FormParam("email") String email,
-			@FormParam("fname") String fname, @FormParam("lname") String lname, @FormParam("dob") String dob,
-			@FormParam("address") String address, @FormParam("tp_number") int tp_number) {
-		String output = userObj.insertUser(user_level, email, fname, lname, dob, address, tp_number);
-		return output;
-	}
+	String returnValue = "";
+	returnValue = user.readUsers(userID);
+	return returnValue;
+}
 
-	@PUT
-	@Path("/")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String updateUser(String userData) {
-//Convert the input string to a JSON object
-		JsonObject userObject = new JsonParser().parse(userData).getAsJsonObject();
-//Read the values from the JSON object
-		int user_id = userObject.get("user_id").getAsInt();
-		int user_level = userObject.get("user_level").getAsInt();
-		String email = userObject.get("email").getAsString();
-		String fname = userObject.get("fname").getAsString();
-		String lname = userObject.get("lname").getAsString();
-		String dob = userObject.get("dob").getAsString();
-		String address = userObject.get("address").getAsString();
-		int tp_number = userObject.get("tp_number").getAsInt();
-		String output = userObj.updateUser(user_id, user_level, email, fname, lname, dob, address, tp_number);
-		return output;
-	}
+@POST
+@Path("/")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public String insertUser(String data) {
+	JsonObject result = new JsonObject();
+	result.addProperty("status", "error");
+	int user_level = 0;
+	String email ;
+	String fname;
+	String lname;
+	String dob;
+	String address;
+	int tp_number = 0;
 
-	@DELETE
-	@Path("/")
-	@Consumes(MediaType.APPLICATION_XML)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String deleteUser(String itemData) {
-//Convert the input string to an XML document
-		Document doc = Jsoup.parse(itemData, "", Parser.xmlParser());
-
-//Read the value from the element <itemID>
-		String userid = doc.select("user_id").text();
-		String output = userObj.deleteUser(userid);
-		return output;
-	}
-
-	@GET
-	@Path("userLevel/{user_id}")
-	@Consumes(MediaType.TEXT_PLAIN)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserLevel(@DefaultValue("0") @QueryParam("user_id") Integer user,
-			@DefaultValue("") @QueryParam("key") String key) {
+	try {
+		JsonObject userObject = new JsonParser().parse(data).getAsJsonObject();
 		// request validation
-		if (!RequestValidator.validate(key)) {
-			JsonObject result = new JsonObject();
-			result.addProperty("status", "error_unauthorized");
+		if (!RequestValidator.validate(userObject.get("key").getAsString())) {
 			return result.toString();
 		}
+		
 
-		String returnValue = "";
-		returnValue = userObj.returnUserLevel(user);
-		return returnValue;
+		if (userObject.has("MultipleUsers")) {
+
+			for (JsonElement singleUser : userObject.get("users").getAsJsonArray()) {
+				JsonObject userObj = singleUser.getAsJsonObject();
+				user_level = userObj.get("user_level").getAsInt();
+				email = userObj.get("email").getAsString();
+				fname = userObj.get("fname").getAsString();
+				lname = userObj.get("lname").getAsString();
+				dob = userObj.get("dob").getAsString();
+				address = userObj.get("address").getAsString();
+				tp_number = userObj.get("tp_number").getAsInt();
+				user.insertUser(user_level, email, fname, lname, dob, address, tp_number);
+
+			}
+			result.addProperty("status", "done_all");
+
+		} else if (userObject.has("SingleUser")) {
+			user_level = userObject.get("user_level").getAsInt();
+			email = userObject.get("email").getAsString();
+			fname = userObject.get("fname").getAsString();
+			lname = userObject.get("lname").getAsString();
+			dob = userObject.get("dob").getAsString();
+			address = userObject.get("address").getAsString();
+			tp_number = userObject.get("tp_number").getAsInt();
+			if(user.insertUser(user_level, email, fname, lname, dob, address, tp_number)) {
+				result.addProperty("status", "done");
+			}
+		}
+
+	} catch (Exception e) {
+		e.printStackTrace();
+		result.addProperty("status", "error");
 	}
 
+	return result.toString();
 }
+
+@PUT
+@Path("/")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public String updateUser(String userData)
+{
+//Convert the input string to a JSON object
+ JsonObject userObject = new JsonParser().parse(userData).getAsJsonObject();
+ String key = userObject.get("key").getAsString();
+//request validation
+	if (!RequestValidator.validate(key)) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error_unauthorized");
+		return result.toString();
+	}
+//Read the values from the JSON object
+ int user_id = userObject.get("user_id").getAsInt();
+ int user_level = userObject.get("user_level").getAsInt();
+ String email = userObject.get("email").getAsString();
+ String fname = userObject.get("fname").getAsString();
+ String lname = userObject.get("lname").getAsString();
+ String dob = userObject.get("dob").getAsString();
+ String address = userObject.get("address").getAsString();
+ int tp_number = userObject.get("tp_number").getAsInt();
+ String output = user.updateUser(user_id,user_level, email, fname, lname, dob, address, tp_number);
+ return "{status:" + output + "}";
+}
+
+@DELETE
+@Path("/")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public String deleteUser(String data) {
+	String returnValue = "failed";
+	JsonObject userObject = new JsonParser().parse(data).getAsJsonObject();
+	String key = userObject.get("key").getAsString();
+	// request validation
+	if (!RequestValidator.validate(key)) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error_unauthorized");
+		return result.toString();
+	}
+	int userId = userObject.get("user_id").getAsInt();
+		returnValue = user.deleteUser(userId);
+		return "{status:" + returnValue + "}";
+}
+
+@GET
+@Path("userLevel/{user_id}")
+@Consumes(MediaType.TEXT_PLAIN)
+@Produces(MediaType.APPLICATION_JSON)
+public String getUserLevel(@DefaultValue("0") @QueryParam("user_id") Integer user,
+		@DefaultValue("") @QueryParam("key") String key) {
+	// request validation
+	if (!RequestValidator.validate(key)) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error_unauthorized");
+		return result.toString();
+	}
+
+	String returnValue = "";
+	//returnValue = user.returnUserLevel(user);
+	return returnValue;
+}
+
+}
+
+
