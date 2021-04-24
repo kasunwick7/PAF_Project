@@ -25,7 +25,8 @@ import org.jsoup.nodes.Document;
 public class FundService {
 	
 	Funds funds1 = new Funds();
-
+	
+	RequestValidator rs = new RequestValidator();
 	
 	@POST
 	@Path("/")
@@ -33,7 +34,7 @@ public class FundService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String addFundDetails(String fundData) {
 		JsonObject result = new JsonObject();
-		result.addProperty("status", "error");
+		result.addProperty("status", "error_1");
 		int fundID;
 		
 		int researchID;
@@ -45,7 +46,7 @@ public class FundService {
 		try {
 			JsonObject fundObject = new JsonParser().parse(fundData).getAsJsonObject();
 			// request validation
-			if (!RequestValidator.validate(fundObject.get("key").getAsString())) {
+			if (!rs.validate(fundObject.get("key").getAsString())) {
 				return result.toString();
 			}
 			
@@ -80,7 +81,7 @@ public class FundService {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			result.addProperty("status", "error");
+			result.addProperty("status", "error_");
 		}
 
 		return result.toString();
@@ -116,7 +117,7 @@ public class FundService {
 		JsonObject fundObject = new JsonParser().parse(fundData).getAsJsonObject();
 		String key = fundObject.get("key").getAsString();
 		// request validation
-		if (!RequestValidator.validate(key)) {
+		if (!rs.validate(key)) {
 			JsonObject result = new JsonObject();
 			result.addProperty("status", "error_unauthorized");
 			return result.toString();
@@ -144,9 +145,9 @@ public class FundService {
 //		JsonObject fundObj = new JsonParser().parse(fundData).getAsJsonObject();
 //		String key = fundObj.get("key").getAsString();
 //		
-		if(!RequestValidator.validate(key)) {
+		if(!rs.validate(key)) {
 			JsonObject results = new JsonObject();
-			results.addProperty("Status", "erro_unauthorized");
+			results.addProperty("Status", "error_unauthorized");
 			return results.toString();
 		}
 		
@@ -167,9 +168,9 @@ public class FundService {
 //		JsonObject fundObject = new JsonParser().parse(fundData).getAsJsonObject();
 //		int fundID = fundObject.get("fundID").getAsInt();
 		
-		if(!RequestValidator.validate(key)) {
+		if(!rs.validate(key)) {
 			JsonObject results = new JsonObject();
-			results.addProperty("Status", "erro_unauthorized");
+			results.addProperty("Status", "error_unauthorized");
 			return results.toString();
 		}
 		
