@@ -137,9 +137,20 @@ public class FundService {
 	
 	@GET
 	@Path("/")
-	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public String getAllresearchProjects()
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAllresearchProjects(@DefaultValue("") @QueryParam("key") String key)
 	{
+//		JsonObject fundObj = new JsonParser().parse(fundData).getAsJsonObject();
+//		String key = fundObj.get("key").getAsString();
+//		
+		if(!RequestValidator.validate(key)) {
+			JsonObject results = new JsonObject();
+			results.addProperty("Status", "erro_unauthorized");
+			return results.toString();
+		}
+		
+		
 		return funds1.getAllFundDetails();
 	}
 
@@ -147,11 +158,21 @@ public class FundService {
 	@GET
 	@Path("/fundDetail")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String readItem(String fundData) {
+	public String readItem(@DefaultValue("0") @QueryParam("fundID") Integer fundID,
+			@DefaultValue("") @QueryParam("key") String key) {
 		// request validation
-		JsonObject fundObj = new JsonParser().parse(fundData).getAsJsonObject();
-
-		int fundID = fundObj.get("fundID").getAsInt();
+//		JsonObject itemObj = new JsonParser().parse(fundData).getAsJsonObject();
+//		String key = itemObj.get("key").getAsString();
+//
+//		JsonObject fundObject = new JsonParser().parse(fundData).getAsJsonObject();
+//		int fundID = fundObject.get("fundID").getAsInt();
+		
+		if(!RequestValidator.validate(key)) {
+			JsonObject results = new JsonObject();
+			results.addProperty("Status", "erro_unauthorized");
+			return results.toString();
+		}
+		
 			
 		return funds1.getFundDetails(fundID);
 	}
