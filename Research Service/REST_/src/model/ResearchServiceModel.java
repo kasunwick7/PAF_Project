@@ -22,6 +22,7 @@ import com.google.gson.JsonParser;
 public class ResearchServiceModel {
 	
 	ResearchService researchObj = new ResearchService();
+	RequestValidator requestValidator =  new RequestValidator();
 	
 	@POST
 	@Path("/test")
@@ -56,8 +57,9 @@ public String addResearchProject(String researchData)
 		
 		JsonObject research = new JsonParser().parse(researchData).getAsJsonObject();
 		
+		
 		//request validation
-		if (!RequestValidator.validate(research.get("key").getAsString())) {
+		if (!requestValidator.validate(research.get("key").getAsString())) {
 			
 			
 			return result.toString();
@@ -125,7 +127,7 @@ public String getAllresearchProjects(@DefaultValue("") @QueryParam("key") String
 	//String key = itemObject.get("key").getAsString();
 	
 	// request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
@@ -148,7 +150,7 @@ public String getresearchProjects(@DefaultValue("0") @QueryParam("researchID") I
 	//int researchID = researhObject.get("researchID").getAsInt();
 	
 	// request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
@@ -171,7 +173,7 @@ public String searchResearch(@DefaultValue("") @QueryParam("researchName") Strin
 	//String researchName = researhObject.get("researchName").getAsString();
 	
 	// request validation
-			if (!RequestValidator.validate(key)) {
+			if (!requestValidator.validate(key)) {
 				JsonObject result = new JsonObject();
 				result.addProperty("status", "error_unauthorized");
 				return result.toString();
@@ -193,7 +195,7 @@ public String searchResearchByCategory(@DefaultValue("") @QueryParam("researchCa
 	//String researchCategory = researhObject.get("researchCategory").getAsString();
 	
 	// request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
@@ -214,7 +216,7 @@ public String updateResearch(String researchData)
 	JsonObject research = new JsonParser().parse(researchData).getAsJsonObject();
 	
 	//request validation
-	if (!RequestValidator.validate(research.get("key").getAsString())) {
+	if (!requestValidator.validate(research.get("key").getAsString())) {
 		
 		return result.toString();
 	}
@@ -249,7 +251,7 @@ public String deleteResearch(String researchData)
 	String key = researhObject.get("key").getAsString();
 	
 	// request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
