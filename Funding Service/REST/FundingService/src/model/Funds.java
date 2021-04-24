@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 public class Funds 
 { //A common method to connect to the DB
 	private Connection connect() 
@@ -16,7 +19,7 @@ public class Funds
 			Class.forName("com.mysql.jdbc.Driver"); 
  
 			//Provide the correct details: DBServer/DBName, username, password 
-			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paf_project", "root", "Sasitha@2020"); 
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paf_fund_management", "paf_user", "^paf_user_pw_000"); 
 		} 
 		catch (Exception e) 
 		{e.printStackTrace();} 
@@ -24,92 +27,42 @@ public class Funds
 	} 
 	
 	
-	public String insertItem(String funderName, String amount, String fundingDate,String fundStatus) 
+	public boolean addFundPayment(int researchID, String funderName, String amount, String fundingDate,String fundStatus) 
 	{ 
-		String output = ""; 
+//		String output = ""; 
 		try
 		{ 
 			Connection con = connect(); 
 			if (con == null) 
-			{return "Error while connecting to the database for inserting."; } 
+			{return false; } 
 			// create a prepared statement
-			String query = " insert into funds (`fundID`,`funderName`,`amount`,`fundingDate`,`fundStatus`)"
-					+ " values (?, ?, ? ,? ,?)"; 
+			String query = " insert into funds (`fundID`,`researchID`,`funderName`,`amount`,`fundingDate`,`fundStatus`)"
+					+ " values (?, ?, ?, ?, ?, ?)"; 
+//			(`researchID`,`funderName`,`amount`,`fundingDate`,`fundStatus`)
 			PreparedStatement preparedStmt = con.prepareStatement(query); 
 			// binding values
-			preparedStmt.setInt(1, 0); 
-			preparedStmt.setString(2, funderName); 
-			preparedStmt.setDouble(3, Double.parseDouble(amount)); 
-			preparedStmt.setString(4, fundingDate);
-			preparedStmt.setString(5, fundStatus); 
+			preparedStmt.setInt(1, 0);
+			preparedStmt.setInt(2, researchID); 
+			preparedStmt.setString(3, funderName); 
+			preparedStmt.setDouble(4, Double.parseDouble(amount)); 
+			preparedStmt.setString(5, fundingDate);
+			preparedStmt.setString(6, fundStatus); 
 			// execute the statement3
 			preparedStmt.execute(); 
 			con.close(); 
-			output = "Inserted successfully"; 
+//			output = "Inserted successfully"; 
 		} 
 		catch (Exception e) 
 		{ 
-			output = "Error while inserting the fund details."; 
+//			output = "Error while inserting the fund details."; 
 			System.err.println(e.getMessage()); 
+			return false;
 		} 
-		return output; 
+		return true; 
 	} 
 	
 	
-	public String readItems() 
-	{ 
-		String output = ""; 
-		try
-		{ 
-			Connection con = connect(); 
-			if (con == null) 
-			{return "Error while connecting to the database for reading."; } 
-			// Prepare the html table to be displayed
-			output = "<table border='1'><tr><th>Item Code</th><th>Item Name</th>" +
-					"<th>Item Price</th>" + 
-					"<th>Item Description</th>" +
-					"<th>Update</th><th>Remove</th></tr>"; 
- 
-			String query = "select * from funds"; 
-			Statement stmt = con.createStatement(); 
-			ResultSet rs = stmt.executeQuery(query); 
-			// iterate through the rows in the result set
-			while (rs.next()) 
-			{ 
-				String fundID = Integer.toString(rs.getInt("fundID")); 
-				String funderName = rs.getString("funderName"); 
-				String amount = Double.toString(rs.getDouble("amount")); 
-				String fundingDate = rs.getString("fundingDate"); 
-				String fundStatus = rs.getString("fundStatus"); 
-				// Add into the html table
-				output += "<tr><td>" + fundID + "</td>"; 
-				output += "<td>" + funderName + "</td>"; 
-				output += "<td>" + amount + "</td>"; 
-				output += "<td>" + fundingDate + "</td>"; 
-				output += "<td>" + fundStatus + "</td>"; 
-				// buttons
-				output += "<td><input name='btnUpdate' type='button' value='Update' class='btn btn-secondary'></td>"
-						+ "<td><form method='post' action='items.jsp'>"
-						+ "<input name='btnRemove' type='submit' value='Remove' class='btn btn-danger'>"
-						+ "<input name='itemID' type='hidden' value='" + fundID 
-						+ "'>" + "</form></td></tr>"; 
-			} 
-			con.close(); 
-			// Complete the html table
-			output += "</table>"; 
-			
-			
-		} 
-		catch (Exception e) 
-		{ 
-			output = "Error while reading the fund details."; 
-			System.err.println(e.getMessage()); 
-			
-		} 
-		return output;
-		 
-	} 
-	public String updateItem(String fundID, String funderName, String amount, String fundingDate, String fundStatus)
+	public String updateFundPayment(String fundID, int researchID, String funderName, String amount, String fundingDate, String fundStatus)
 	{ 
 		String output = ""; 
 		try
@@ -118,14 +71,15 @@ public class Funds
 			if (con == null) 
 			{return "Error while connecting to the database for updating."; } 
 			// create a prepared statement
-			String query = "UPDATE funds SET funderName=?,amount=?,fundingDate=?,fundStatus=? WHERE fundID=?"; 
+			String query = "UPDATE funds SET researchID=?,funderName=?,amount=?,fundingDate=?,fundStatus=? WHERE fundID=?"; 
 			PreparedStatement preparedStmt = con.prepareStatement(query); 
 			// binding values
-			preparedStmt.setString(1, funderName); 
-			preparedStmt.setDouble(2,Double.parseDouble(amount)); 
-			preparedStmt.setString(3,fundingDate); 
-			preparedStmt.setString(4, fundStatus); 
-			preparedStmt.setInt(5, Integer.parseInt(fundID)); 
+			preparedStmt.setInt(1, researchID);
+			preparedStmt.setString(2, funderName); 
+			preparedStmt.setDouble(3,Double.parseDouble(amount)); 
+			preparedStmt.setString(4,fundingDate); 
+			preparedStmt.setString(5, fundStatus); 
+			preparedStmt.setInt(6, Integer.parseInt(fundID)); 
 			// execute the statement
 			preparedStmt.execute(); 
 			con.close(); 
@@ -140,7 +94,7 @@ public class Funds
 	} 
 	
 	
-	public String deleteItem(String fundID) 
+	public String deleteFundPayment(String fundID) 
 	{ 
 		String output = ""; 
 		try
@@ -165,4 +119,101 @@ public class Funds
 		} 
 		return output; 
 	} 
+	
+	public String getAllFundDetails()
+	{
+		JsonObject fundDetails = new JsonObject();
+
+		String output = "error";
+
+		try {
+
+			Connection con = connect();
+			if(con == null)
+			{
+				return fundDetails.toString();
+			}
+
+			String readSql = "SELECT * FROM funds";
+			PreparedStatement statement = con.prepareStatement(readSql);
+			ResultSet results = statement.executeQuery(readSql);
+
+			JsonArray fundArray = new JsonArray();
+			
+
+			while(results.next())
+			{
+				JsonObject fundObject = new JsonObject();
+				fundObject.addProperty("fundID", results.getInt(1));
+				fundObject.addProperty("researchID", results.getString(2));
+				fundObject.addProperty("funderName", results.getString(3));
+				fundObject.addProperty("amount", results.getDouble(4));
+				fundObject.addProperty("fundingDate", results.getString(5));
+				fundObject.addProperty("fundStatus", results.getString(6));
+				
+				fundArray.add(fundObject);
+			}
+
+			fundDetails.add("funds", fundArray);
+
+			con.close();
+
+		}catch(Exception e)
+		{
+			System.out.print("Error While Reading from the Database");
+			System.out.print(e);
+			fundDetails.addProperty("status", "error");
+
+		}
+
+		return fundDetails.toString();
+
+	}
+	
+	public String getFundDetails(int fundID) {
+		JsonObject fundData = new JsonObject();
+
+		try {
+
+			Connection con = connect();
+			if (con == null) {
+				return fundData.toString();
+			}
+			// create a prepared statement
+			String query = " select * from funds where fundID = ? ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			// binding values
+
+			preparedStmt.setInt(1, fundID);
+			ResultSet rs = preparedStmt.executeQuery();
+
+			JsonArray array = new JsonArray();
+			JsonObject fundItems = new JsonObject();
+			while (rs.next()) {
+
+//				fundItems.addProperty("fundID", rs.getInt(1));
+				fundItems.addProperty("researchID", rs.getInt(2));
+				fundItems.addProperty("funderName", rs.getString(3));
+				fundItems.addProperty("amount", rs.getDouble(4));
+				fundItems.addProperty("fundingDate", rs.getString(5));
+				fundItems.addProperty("fundStatus", rs.getString(6));
+				array.add(fundItems);
+
+			}
+			fundData.add("funds", array);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			fundData.addProperty("status", "error");
+			return fundData.toString();
+
+		}
+
+		return fundData.toString();
+	}
+	
+	
+	
+	
 } 

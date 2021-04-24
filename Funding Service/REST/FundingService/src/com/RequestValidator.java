@@ -11,7 +11,7 @@ public class RequestValidator {
 		// request validation
 
 		Client client;
-		String baseuri = "http://localhost:8080/authentication-service/API/requestvalidator";
+		String baseuri = "http://localhost:8081/authentication-service/API/requestvalidator";
 		ClientResponse response;
 		String output = null;
 

@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import com.google.gson.JsonObject;
+
 public class AuthenticationModel {
 	private Connection connect() {
 		Connection con = null;
@@ -21,15 +23,21 @@ public class AuthenticationModel {
 		return con;
 	}
 
-	public String[] userValidation(String usename, String password) {
-		String output[] = new String[2];
-		output[0] = ""; // validation status
-		output[1] = ""; // key
+	public String userValidation(String usename, String password) {
+		JsonObject result = new JsonObject();
+		result.addProperty("validation_status", "error");
+		result.addProperty("key", "");
+		result.addProperty("user_id", "");
+		String status = "";
+		String key = "";
+		String userid = "";
+		//
 		try {
+
 			Connection con = connect();
 			if (con == null) {
-				output[0] = "Error while connecting to the database for inserting.";
-				return output;
+				result.addProperty("validation_status", "DB error");
+				return result.toString();
 			}
 			// create a prepared statement
 			String query = " SELECT * FROM user_credentials where username = ? and password = ? ";
@@ -44,25 +52,29 @@ public class AuthenticationModel {
 			ResultSet rs = preparedStmt.executeQuery();
 			int userID = 0;
 
-			int result = 0;
+			int result1 = 0;
 			if (rs.next()) {
-				result++;
+				result1++;
 				userID = rs.getInt(1);
-
 			}
-			if (result == 1) {
-				output[0] = "valid";
-				output[1] = this.addUserToCurrentyLoggedInTable(userID);
+			if (result1 == 1) {
+				status = "valid";
+				key = this.addUserToCurrentyLoggedInTable(userID);
+				userid = String.valueOf(userID);
 			} else {
-				output[0] = "invalid";
+				status = "invalid";
 			}
 			con.close();
+			System.out.println(result1);
 
 		} catch (Exception e) {
-			output[0] = "Error while inserting the item.";
+			result.addProperty("validation_status", "exception");
 			System.err.println(e.getMessage());
 		}
-		return output;
+		result.addProperty("validation_status", status);
+		result.addProperty("key", key);
+		result.addProperty("user_id", userid);
+		return result.toString();
 	}
 
 	public String addUserToCurrentyLoggedInTable(int userID) {
@@ -238,6 +250,30 @@ public class AuthenticationModel {
 			}
 		} catch (Exception e) {
 			output = "Exception";
+		}
+
+		return output;
+	}
+
+	public boolean removeCredentials(int user_id) {
+
+		boolean output = false;
+
+		try {
+			Connection con = connect();
+			if (con == null) {
+				return false;
+			}
+
+			String query = " delete from user_credentials where user_id = ? ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			preparedStmt.setInt(1, user_id);
+			int result = preparedStmt.executeUpdate();
+			if (result > 0) {
+				output = true;
+			}
+		} catch (Exception e) {
+			output = false;
 		}
 
 		return output;
