@@ -56,7 +56,7 @@ public class AuthenticationService {
 		result.addProperty("status", "error");
 		String key = itemObject.get("key").getAsString();
 		String status = auth.requestValidation(key);
-		result.addProperty("status", status);
+		result.addProperty("validation_status", status);
 		return result.toString();
 	}
 
