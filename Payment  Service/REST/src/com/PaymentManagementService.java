@@ -17,6 +17,7 @@ import model.PaymentManagementModel;
 @Path("/")
 public class PaymentManagementService {
 	PaymentManagementModel cart = new PaymentManagementModel();
+	RequestValidator requestValidator =  new RequestValidator();
 
 	@POST
 	@Path("/cartItems")
@@ -33,7 +34,7 @@ public class PaymentManagementService {
 		try {
 			JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
 			// request validation
-			if (!RequestValidator.validate(itemObject.get("key").getAsString())) {
+			if (!requestValidator.validate(itemObject.get("key").getAsString())) {
 				return result.toString();
 			}
 			userId = itemObject.get("user_id").getAsInt();
@@ -77,7 +78,7 @@ public class PaymentManagementService {
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
 		String key = itemObject.get("key").getAsString();
 		// request validation
-		if (!RequestValidator.validate(key)) {
+		if (!requestValidator.validate(key)) {
 			return result.toString();
 		}
 		int userId = itemObject.get("user_id").getAsInt();
@@ -102,7 +103,7 @@ public class PaymentManagementService {
 	public String readItem(@DefaultValue("0") @QueryParam("user_id") Integer user,
 			@DefaultValue("") @QueryParam("key") String key) {
 		// request validation
-		if (!RequestValidator.validate(key)) {
+		if (!requestValidator.validate(key)) {
 			JsonObject result = new JsonObject();
 			result.addProperty("status", "error_unauthorized");
 			return result.toString();
@@ -123,7 +124,7 @@ public class PaymentManagementService {
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
 		String key = itemObject.get("key").getAsString();
 		// request validation
-		if (!RequestValidator.validate(key)) {
+		if (!requestValidator.validate(key)) {
 			JsonObject result = new JsonObject();
 			result.addProperty("status", "error_unauthorized");
 			return result.toString();
@@ -142,7 +143,7 @@ public class PaymentManagementService {
 	public String readHistory(@DefaultValue("") @QueryParam("key") String key) {
 
 		// request validation
-		if (!RequestValidator.validate(key)) {
+		if (!requestValidator.validate(key)) {
 			JsonObject result = new JsonObject();
 			result.addProperty("status", "error_unauthorized");
 			return result.toString();
