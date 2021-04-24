@@ -18,8 +18,8 @@ import model.AuthenticationModel;
 public class AuthenticationService {
 	AuthenticationModel auth = new AuthenticationModel();
 
-	@GET
-	@Path("/login")
+	@POST
+	@Path("/session") // login
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String newLoginRequest(String data) {
@@ -30,6 +30,21 @@ public class AuthenticationService {
 	}
 
 	// -----------------------------------------
+	@DELETE
+	@Path("/session") // logout
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String logOut(String data) {
+		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error");
+		String key = itemObject.get("key").getAsString();
+		String status = auth.logOut(key);
+		result.addProperty("status", status);
+		return result.toString();
+	}
+
+	// -------------------------------------------
 
 	@POST
 	@Path("/requestvalidator")
@@ -37,31 +52,23 @@ public class AuthenticationService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String requestvalidator(String data) {
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error");
 		String key = itemObject.get("key").getAsString();
 		String status = auth.requestValidation(key);
-		return "{validation_status:" + status + "}";
-	}
-
-	// -------------------------------------------
-
-	@DELETE
-	@Path("/logout")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String logOut(String data) {
-		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
-		String key = itemObject.get("key").getAsString();
-		String status = auth.logOut(key);
-		return "{status:" + status + "}";
+		result.addProperty("status", status);
+		return result.toString();
 	}
 
 	// -------------------------------------------
 
 	@PUT
-	@Path("/update")
+	@Path("/credentials") // update user credentials
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String credentialUpdate(String data) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error");
 		String status = "error";
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
 		String key = itemObject.get("key").getAsString();
@@ -72,26 +79,56 @@ public class AuthenticationService {
 		if (auth.requestValidation(key).equals("valid")) {
 			status = auth.credentialUpdate(Integer.valueOf(id), username, password);
 		}
-		return "{status:" + status + "}";
+		result.addProperty("status", status);
+		return result.toString();
 	}
 
 	// -------------------------------------------
 
 	@POST
-	@Path("/add")
+	@Path("/credentials") // add new user credentials
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String addUser(String data) {
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
-		String status = "error";
-		String key = itemObject.get("key").getAsString();
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error");
 		int id = itemObject.get("user_id").getAsInt();
 		String username = itemObject.get("username").getAsString();
 		String password = itemObject.get("password").getAsString();
-
-		if (auth.requestValidation(key).equals("valid")) {
+		String status = "";
+		try {
 			status = auth.addUser(id, username, password);
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-		return "{status:" + status + "}";
+		result.addProperty("status", status);
+		return result.toString();
+	}
+
+	// ------------------------------------------------------------
+
+	@DELETE
+	@Path("/credentials") // remove user credentials
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String removeUser(String data) {
+		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
+		String status = "error";
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error");
+		String key = itemObject.get("key").getAsString();
+		int id = itemObject.get("user_id").getAsInt();
+
+		// validating request
+		if (auth.requestValidation(key).equals("valid")) {
+
+			if (auth.removeCredentials(id)) {
+				status = auth.logOut(key);
+				result.addProperty("status", status);
+			}
+		}
+
+		return result.toString();
 	}
 }
