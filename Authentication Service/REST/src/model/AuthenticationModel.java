@@ -15,8 +15,8 @@ public class AuthenticationModel {
 		Connection con = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paf_security_management", "paf_user",
-					"^paf_user_pw_000");
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paf_security_management", "root",
+					"1234");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
