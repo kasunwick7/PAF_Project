@@ -30,7 +30,6 @@ public class RequestValidator {
 
 			// response
 			output = response.getEntity(String.class);
-			System.out.print("-------------------------");
 			System.out.print(output);
 
 

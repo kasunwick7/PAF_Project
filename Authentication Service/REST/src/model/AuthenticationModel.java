@@ -255,4 +255,28 @@ public class AuthenticationModel {
 		return output;
 	}
 
+	public boolean removeCredentials(int user_id) {
+
+		boolean output = false;
+
+		try {
+			Connection con = connect();
+			if (con == null) {
+				return false;
+			}
+
+			String query = " delete from user_credentials where user_id = ? ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			preparedStmt.setInt(1, user_id);
+			int result = preparedStmt.executeUpdate();
+			if (result > 0) {
+				output = true;
+			}
+		} catch (Exception e) {
+			output = false;
+		}
+
+		return output;
+	}
+
 }

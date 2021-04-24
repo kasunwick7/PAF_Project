@@ -22,7 +22,7 @@ public class PaymentManagementService {
 	@Path("/cartItems")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	//insert item/s
+	// insert item/s
 	public String addItem(String data) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error");
@@ -70,26 +70,28 @@ public class PaymentManagementService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String removeItem(String data) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", "error");
 		String returnValue = "failed";
+
 		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
 		String key = itemObject.get("key").getAsString();
 		// request validation
 		if (!RequestValidator.validate(key)) {
-			JsonObject result = new JsonObject();
-			result.addProperty("status", "error_unauthorized");
 			return result.toString();
 		}
 		int userId = itemObject.get("user_id").getAsInt();
 		if (!itemObject.has("product_id")) {
 			// delete all
 			returnValue = cart.removeItemFromCart(userId);
-			return "{status:" + returnValue + "}";
+			result.addProperty("status", returnValue);
+			return result.toString();
 		}
 		int productId = itemObject.get("product_id").getAsInt();
 		// delete one by one
 		returnValue = cart.removeItemFromCart(userId, productId);
-
-		return "{status:" + returnValue + "}";
+		result.addProperty("status", returnValue);
+		return result.toString();
 	}
 
 	@GET
@@ -110,4 +112,43 @@ public class PaymentManagementService {
 		returnValue = cart.returnCartDetails(user);
 		return returnValue;
 	}
+
+	// when shopping cart is done
+	@DELETE
+	@Path("/buyCart")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String buyCart(String data) {
+
+		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
+		String key = itemObject.get("key").getAsString();
+		// request validation
+		if (!RequestValidator.validate(key)) {
+			JsonObject result = new JsonObject();
+			result.addProperty("status", "error_unauthorized");
+			return result.toString();
+		}
+
+		int userId = itemObject.get("user_id").getAsInt();
+
+		return cart.endShopping(userId);
+	}
+	
+	//read payment history
+	@GET
+	@Path("/history")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String readHistory(@DefaultValue("") @QueryParam("key") String key) {
+
+		// request validation
+		if (!RequestValidator.validate(key)) {
+			JsonObject result = new JsonObject();
+			result.addProperty("status", "error_unauthorized");
+			return result.toString();
+		}
+
+		return cart.readHistory();
+	}
+
 }
