@@ -43,6 +43,31 @@ LOCK TABLES `products` WRITE;
 INSERT INTO `products` VALUES (1,1,'bb','bb',1,12,'2021-04-20'),(2,1,'aa','aa',1,10,'2021-04-20'),(3,1,'aa','aa',1,10,'2021-04-20'),(4,1,'aa','aa',1,10,'2021-04-20'),(5,1,'aa','aa',1,10,'2021-04-20'),(8,1,'aa','aa',1,10,'2021-04-20'),(9,1,'aa','aa',1,10,'2021-04-20'),(13,1,'aa','aa',1,10,'2021-04-20'),(14,1,'aa','aa',1,10,'2021-04-20'),(15,1,'aa','aa',1,10,'2021-04-20'),(16,1,'aa','aa',1,10,'2021-04-20'),(17,1,'aa','aa',1,10,'2021-04-20'),(18,1,'aa','aa',1,10,'2021-04-20'),(19,1,'aa','aa',1,10,'2021-04-20'),(20,1,'aa','aa',1,10,'2021-04-20'),(21,1,'aa','aa',1,10,'2021-04-20');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `products_sold`
+--
+
+DROP TABLE IF EXISTS `products_sold`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `products_sold` (
+  `products_id` int(11) NOT NULL,
+  `buyer_id` int(11) DEFAULT NULL,
+  `sold_date` date DEFAULT NULL,
+  PRIMARY KEY (`products_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `products_sold`
+--
+
+LOCK TABLES `products_sold` WRITE;
+/*!40000 ALTER TABLE `products_sold` DISABLE KEYS */;
+INSERT INTO `products_sold` VALUES (1,1,'2021-04-20'),(2,2,'2021-04-20');
+/*!40000 ALTER TABLE `products_sold` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -53,4 +78,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-25  6:33:34
+-- Dump completed on 2021-04-25 18:43:34
