@@ -134,6 +134,47 @@ public class ProductManagementModel {
 		return products.toString();
 	}
 	
+	public String readSoldProducts() {
+		JsonObject SoldProducts = new JsonObject();
+		
+		try {
+
+			Connection con = connect();
+			if (con == null) {
+				return SoldProducts.toString();
+			}
+			// create a prepared statement
+			String query = " select * from products_sold ";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			// binding values
+
+			
+			ResultSet rs = preparedStmt.executeQuery();
+
+			JsonArray array = new JsonArray();
+			JsonObject innerProducts= new JsonObject();
+			while (rs.next()) {
+
+				innerProducts.addProperty("products_id", rs.getInt(1));
+				innerProducts.addProperty("buyer_id", rs.getInt(2));
+				innerProducts.addProperty("sold_date", rs.getString(3));
+			
+				array.add(innerProducts);
+
+			}
+			SoldProducts.add("sold_Products", array);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			SoldProducts.addProperty("status", "error");
+			return SoldProducts.toString();
+
+		}
+
+		return SoldProducts.toString();
+	}
+	
 	public String readProducts(int products_id) {
 		
 		JsonObject products = new JsonObject();

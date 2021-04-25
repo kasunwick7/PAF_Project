@@ -171,7 +171,7 @@ public class ProductManagementService {
 	
 	
 	@GET
-	@Path("/")
+	@Path("/readProducts")
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	
@@ -199,6 +199,26 @@ public class ProductManagementService {
 		
 		
 		
+		return returnValue;
+	}
+	
+	@GET
+	@Path("/readSoldProducts")
+	@Consumes(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
+	
+	public String readSoldProducts(@DefaultValue("") @QueryParam("key") String key) {
+		
+		// request validation
+		if (!requestValidator.validate(key)) {
+			JsonObject result = new JsonObject();
+			result.addProperty("status", "error_unauthorized");
+			return result.toString();
+		}
+		
+		String returnValue = "";
+		returnValue = products.readSoldProducts();
+			
 		return returnValue;
 	}
 	
