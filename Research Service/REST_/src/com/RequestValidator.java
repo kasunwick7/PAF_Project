@@ -35,8 +35,8 @@ public class RequestValidator {
 			output = response.getEntity(String.class);
 			System.out.print(output);
 			try {
-					JsonObject itemObject = new JsonParser().parse(output).getAsJsonObject();
-					String status = itemObject.get("validation_status").getAsString();
+					JsonObject researchObject = new JsonParser().parse(output).getAsJsonObject();
+					String status = researchObject.get("validation_status").getAsString();
 					if (status.equals("valid")) 
 					{
 						
