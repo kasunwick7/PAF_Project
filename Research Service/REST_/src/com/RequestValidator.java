@@ -1,12 +1,14 @@
 package com;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 public class RequestValidator {
 	
-	public static boolean validate(String key) {
+	public boolean validate(String key) {
 
 		// request validation
 
@@ -31,18 +33,32 @@ public class RequestValidator {
 
 			// response
 			output = response.getEntity(String.class);
-			System.out.print("-------------------------");
 			System.out.print(output);
-
+			try {
+					JsonObject researchObject = new JsonParser().parse(output).getAsJsonObject();
+					String status = researchObject.get("validation_status").getAsString();
+					if (status.equals("valid")) 
+					{
+						
+						return true;
+					}
+					
+			} catch (Exception e) {
+				
+				// TODO: handle exception
+			}
+			
 
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 			return false;
+			
 		}
 
 		// end of validation
 
-		return true;
+		return false;
 	}
 
 }

@@ -1,265 +1,357 @@
 package model;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-import com.RequestValidator;
-import com.ResearchService;
-import com.google.gson.JsonElement;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-@Path("/")
 public class ResearchServiceModel {
 	
-	ResearchService researchObj = new ResearchService();
-	
-	@POST
-	@Path("/test")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-
-	public String test(String data) {
-		JsonObject itemObject = new JsonParser().parse(data).getAsJsonObject();
-		return itemObject.toString();
-	}
-	
-	
-@POST
-@Path("/insertresearchProject")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public String addResearchProject(String researchData)
-{
-	JsonObject result = new JsonObject();
-	result.addProperty("status", "error");
-	int researchID = 0;
-	String researchName = "";
-	int researcherId = 0; 
-	String researcherName = "";
-	String researchCategory = "";
-	String researchDescription = "";
-	float researchCost = 0;
-	int researchDuration = 0;
-	String startDate = "";
+	private Connection connect(){
 		
+		Connection con = null;
+		
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/research_db", "paf_user", "^paf_user_pw_000");
+			
+		}catch(Exception e)
+		{
+			System.out.print(e);
+		}
+		
+		return con;
+		
+	}
+
+
+public boolean insertResearchProject(int researchID, String researchName, int researcherId, String researcherName, String researchCategory, String researchDescription, float researchCost, int researchDuration, String startDate)
+{
+	String output = "";
+	
+	
 	try {
 		
-		JsonObject research = new JsonParser().parse(researchData).getAsJsonObject();
-		
-		//request validation
-		if (!RequestValidator.validate(research.get("key").getAsString())) {
-			
-			
-			return result.toString();
-		}
-		
-		researcherId = research.get("user_id").getAsInt();
-
-		if (research.has("researches")) {
-			
-			for (JsonElement singleItem : research.get("researches").getAsJsonArray()) 
-			{
-				JsonObject researchObject = singleItem.getAsJsonObject();
-				
-				researchID = researchObject.get("researchID").getAsInt();
-				researchName = researchObject.get("researchName").getAsString();
-				//researcherId = researchObject.get("researcherId").getAsInt();
-				researcherName = researchObject.get("researcherName").getAsString();
-				researchCategory = researchObject.get("researchCategory").getAsString();
-				researchDescription = researchObject.get("researchDescription").getAsString();
-				researchCost = researchObject.get("researchCost").getAsFloat();
-				researchDuration = researchObject.get("researchDuration").getAsInt();
-				startDate = researchObject.get("startDate").getAsString();
-				
-				researchObj.insertResearchProject(researchID, researchName, researcherId, researcherName, researchCategory, researchDescription, researchCost, researchDuration, startDate);
-				
-			}
-			
-			result.addProperty("status", "done all");
-				
-		} 
-		else if (research.has("researchID")) 
+		Connection con = connect();
+		if(con == null)
 		{
-				researchID = research.get("researchID").getAsInt();
-				researchName = research.get("researchName").getAsString();
-				//researcherId = research.get("researcherId").getAsInt();
-				researcherName = research.get("researcherName").getAsString();
-				researchCategory = research.get("researchCategory").getAsString();
-				researchDescription = research.get("researchDescription").getAsString();
-				researchCost = research.get("researchCost").getAsFloat();
-				researchDuration = research.get("researchDuration").getAsInt();
-				startDate = research.get("startDate").getAsString();
-		
-				if (researchObj.insertResearchProject(researchID, researchName, researcherId, researcherName, researchCategory, researchDescription, researchCost, researchDuration, startDate)) 
-				{
-					result.addProperty("status", "done");
-				}
-				
+			return false;
 		}
 		
-		}catch (Exception e) {
-			e.printStackTrace();
-			result.addProperty("status", "error");
+		String insertSql = "INSERT INTO researchprojects_tb VALUES (?,?,?,?,?,?,?,?,?)";
+		
+		PreparedStatement statement = con.prepareStatement(insertSql);
+		
+		statement.setInt(1, researchID);
+		statement.setString(2, researchName);
+		statement.setInt(3, researcherId);
+		statement.setString(4, researcherName);
+		statement.setString(5, researchCategory);
+		statement.setString(6, researchDescription);
+		statement.setFloat(7, researchCost);
+		statement.setInt(8, researchDuration);
+		statement.setString(9, startDate);
+		
+		statement.execute();
+		con.close();
+		
+		
+		
+	}catch(Exception e)
+	{
+		System.out.print(e);
+		return false;
+	}
+	return true;
+	
+}
+
+public String getAllResearchProjects()
+{
+	JsonObject researchDetails = new JsonObject();
+	
+	try {
+		
+		Connection con = connect();
+		if(con == null)
+		{
+			return researchDetails.toString();
 		}
-
-		return result.toString();
-	}
-
-@GET
-@Path("/getResearchProjects")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public String getAllresearchProjects(@DefaultValue("") @QueryParam("key") String key)//(String researchData)
-{
-	//JsonObject itemObject = new JsonParser().parse(researchData).getAsJsonObject();
-	//String key = itemObject.get("key").getAsString();
-	
-	// request validation
-	if (!RequestValidator.validate(key)) {
-		JsonObject result = new JsonObject();
-		result.addProperty("status", "error_unauthorized");
-		return result.toString();
-	}
-	
-	return researchObj.getAllResearchProjects();
-}
-
 		
-@GET
-@Path("/getResearchProject")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public String getresearchProjects(@DefaultValue("0") @QueryParam("researchID") Integer research, @DefaultValue("") @QueryParam("key") String key)//(String researchData)
-{
-	//JsonObject itemObject = new JsonParser().parse(researchData).getAsJsonObject();
-	//String key = itemObject.get("key").getAsString();
-	
-	//JsonObject researhObject = new JsonParser().parse(researchData).getAsJsonObject();
-	//int researchID = researhObject.get("researchID").getAsInt();
-	
-	// request validation
-	if (!RequestValidator.validate(key)) {
-		JsonObject result = new JsonObject();
-		result.addProperty("status", "error_unauthorized");
-		return result.toString();
-	}
-	
-	
-	return researchObj.getResearchProject(research);
-}
-
-@GET
-@Path("/searchResearchProjects")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public String searchResearch(@DefaultValue("") @QueryParam("researchName") String research, @DefaultValue("") @QueryParam("key") String key)//(String researchData)
-{
-	//JsonObject itemObject = new JsonParser().parse(researchData).getAsJsonObject();
-	//String key = itemObject.get("key").getAsString();
-	
-	//JsonObject researhObject = new JsonParser().parse(researchData).getAsJsonObject();
-	//String researchName = researhObject.get("researchName").getAsString();
-	
-	// request validation
-			if (!RequestValidator.validate(key)) {
-				JsonObject result = new JsonObject();
-				result.addProperty("status", "error_unauthorized");
-				return result.toString();
-			}
-	
-	return researchObj.searchResearchProjects(research);
-}
-
-@GET
-@Path("/searchResearchProjectsCat")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public String searchResearchByCategory(@DefaultValue("") @QueryParam("researchCategory") String research, @DefaultValue("") @QueryParam("key") String key)//(String researchData)
-{
-	//JsonObject itemObject = new JsonParser().parse(researchData).getAsJsonObject();
-	//String key = itemObject.get("key").getAsString();
-	
-	//JsonObject researhObject = new JsonParser().parse(researchData).getAsJsonObject();
-	//String researchCategory = researhObject.get("researchCategory").getAsString();
-	
-	// request validation
-	if (!RequestValidator.validate(key)) {
-		JsonObject result = new JsonObject();
-		result.addProperty("status", "error_unauthorized");
-		return result.toString();
-	}
-	
-	return researchObj.searchResearchProjectsByCategory(research);
-}
-
-@PUT
-@Path("/updateresearchProject")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public String updateResearch(String researchData)
-{
-	JsonObject result = new JsonObject();
-	result.addProperty("status", "error");
-	
-	JsonObject research = new JsonParser().parse(researchData).getAsJsonObject();
-	
-	//request validation
-	if (!RequestValidator.validate(research.get("key").getAsString())) {
+		String readSql = "SELECT * FROM researchprojects_tb";
+		PreparedStatement statement = con.prepareStatement(readSql);
+		ResultSet results = statement.executeQuery();
 		
-		return result.toString();
+		JsonArray researchArray = new JsonArray();
+		
+		while(results.next())
+		{
+			JsonObject researchObject = new JsonObject();
+			
+			researchObject.addProperty("researchID", results.getInt(1));
+			researchObject.addProperty("researchName", results.getString(2));
+			researchObject.addProperty("researcherId", results.getInt(3));
+			researchObject.addProperty("researcherName", results.getString(4));
+			researchObject.addProperty("researchCategory", results.getString(5));
+			researchObject.addProperty("researchDescription", results.getString(6));
+			researchObject.addProperty("researchCost", results.getFloat(7));
+			researchObject.addProperty("researchDuration", results.getInt(8));
+			researchObject.addProperty("startDate", results.getString(9));	
+			
+			researchArray.add(researchObject);
+			
+		}
+		
+		researchDetails.add("resarches", researchArray);
+		
+	}catch(Exception e)
+	{
+		System.out.print("Error While Reading from the Database");
+		System.out.print(e);
+		researchDetails.addProperty("status", "error");
+		
 	}
 	
+	return researchDetails.toString();
 	
-	JsonObject researhObject = new JsonParser().parse(researchData).getAsJsonObject();
-	
-	int researchID = researhObject.get("researchID").getAsInt();
-	String researchName = researhObject.get("researchName").getAsString();
-	int researcherId = researhObject.get("researcherId").getAsInt();
-	String researcherName = researhObject.get("researcherName").getAsString();
-	String researchCategory = researhObject.get("researchCategory").getAsString();
-	String researchDescription = researhObject.get("researchDescription").getAsString();
-	float researchCost = researhObject.get("researchCost").getAsFloat();
-	int researchDuration  = researhObject.get("researchDuration").getAsInt();
-	String startDate = researhObject.get("startDate").getAsString();
-
-	return researchObj.updateResearchProject(researchID, researchName, researcherId, researcherName, researchCategory, researchDescription, researchCost, researchDuration, startDate);
-
 }
 
 
-@DELETE
-@Path("/deleteresearchProject")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public String deleteResearch(String researchData)
+public String getResearchProject(int researchID)
 {
-	String returnValue = "failed";
+	JsonObject researchDetails = new JsonObject();
 	
-	JsonObject researhObject = new JsonParser().parse(researchData).getAsJsonObject();
-	String key = researhObject.get("key").getAsString();
+	String output = "error";
 	
-	// request validation
-	if (!RequestValidator.validate(key)) {
-		JsonObject result = new JsonObject();
-		result.addProperty("status", "error_unauthorized");
-		return result.toString();
+	try {
+		
+		Connection con = connect();
+		if(con == null)
+		{
+			return researchDetails.toString();
+		}
+		
+		String readSql = "SELECT * FROM researchprojects_tb WHERE researchID = ? ";
+		PreparedStatement statement = con.prepareStatement(readSql);
+		
+		statement.setInt(1, researchID);
+		ResultSet results = statement.executeQuery();
+		
+		if(results.next())
+		{
+			researchDetails.addProperty("researchName", results.getString(2));
+			researchDetails.addProperty("researcherId", results.getInt(3));
+			researchDetails.addProperty("researcherName", results.getString(4));
+			researchDetails.addProperty("researchCategory", results.getString(5));
+			researchDetails.addProperty("researchDescription", results.getString(6));
+			researchDetails.addProperty("researchCost", results.getFloat(7));
+			researchDetails.addProperty("researchDuration", results.getInt(8));
+			researchDetails.addProperty("startDate", results.getString(9));
+
+		}
+		
+		con.close();
+		
+	}catch(Exception e)
+	{
+		System.out.print("Error While Reading from the Database");
+		System.out.print(e);
+		researchDetails.addProperty("status", "error");
+		
 	}
+	
+	return researchDetails.toString();
+}
 
-	int researchID = researhObject.get("researchID").getAsInt();
 
-	return researchObj.deleteResearchProject(researchID);
+public String searchResearchProjects(String researchName)
+{
+	JsonObject researchDetails = new JsonObject();
+	
+	String output = "error";
+	
+	try {
+		
+		Connection con = connect();
+		if(con == null)
+		{
+			return researchDetails.toString();
+		}
+		
+		String readSql = "SELECT * FROM researchprojects_tb WHERE researchName LIKE CONCAT( '%',?,'%')";
+		PreparedStatement statement = con.prepareStatement(readSql);
+		
+		statement.setString(1, researchName);
+		
+		ResultSet results = statement.executeQuery();
+		
+		JsonArray researchArray = new JsonArray();
+		
+		
+		while(results.next())
+		{
+			JsonObject researchObject = new JsonObject();
+			
+			researchObject.addProperty("researchName", results.getString(2));
+			researchObject.addProperty("researcherId", results.getInt(3));
+			researchObject.addProperty("researcherName", results.getString(4));
+			researchObject.addProperty("researchCategory", results.getString(5));
+			researchObject.addProperty("researchDescription", results.getString(6));
+			researchObject.addProperty("researchCost", results.getFloat(7));
+			researchObject.addProperty("researchDuration", results.getInt(8));
+			researchObject.addProperty("startDate", results.getString(9));
+			
+			researchArray.add(researchObject);
+		}
+		
+		researchDetails.add("resarches", researchArray);
+		
+		con.close();
+		
+	}catch(Exception e)
+	{
+		System.out.print("Error While Reading from the Database");
+		System.out.print(e);
+		researchDetails.addProperty("status", "error");
+		
+	}
+	
+	return researchDetails.toString();
+}
+
+
+public String searchResearchProjectsByCategory(String researchCategory)
+{
+	JsonObject researchDetails = new JsonObject();
+	
+	String output = "error";
+	
+	try {
+		
+		Connection con = connect();
+		if(con == null)
+		{
+			return researchDetails.toString();
+		}
+		
+		String readSql = "SELECT * FROM researchprojects_tb WHERE researchCategory = ?";
+		PreparedStatement statement = con.prepareStatement(readSql);
+		
+		statement.setString(1, researchCategory);
+		
+		ResultSet results = statement.executeQuery();
+		
+		JsonArray researchArray = new JsonArray();
+		
+		
+		while(results.next())
+		{
+			JsonObject researchObject = new JsonObject();
+			
+			researchObject.addProperty("researchName", results.getString(2));
+			researchObject.addProperty("researcherId", results.getInt(3));
+			researchObject.addProperty("researcherName", results.getString(4));
+			researchObject.addProperty("researchCategory", results.getString(5));
+			researchObject.addProperty("researchDescription", results.getString(6));
+			researchObject.addProperty("researchCost", results.getFloat(7));
+			researchObject.addProperty("researchDuration", results.getInt(8));
+			researchObject.addProperty("startDate", results.getString(9));
+			researchArray.add(researchObject);
+		}
+		
+		researchDetails.add("resarches", researchArray);
+		
+		con.close();
+		
+	}catch(Exception e)
+	{
+		System.out.print("Error While Reading from the Database");
+		System.out.print(e);
+		researchDetails.addProperty("status", "error");
+		
+	}
+	
+	return researchDetails.toString();
+}
+
+
+public String updateResearchProject(int researchID, String researchName, int researcherId, String researcherName, String researchCategory, String researchDescription, float researchCost, int researchDuration, String startDate)
+{
+	String output = "";
+	
+	
+	try {
+		
+		Connection con = connect();
+		if(con == null)
+		{
+			return "Error while connecting to the database for updating";
+		}
+		
+		String insertSql = "UPDATE researchprojects_tb SET researchName = ?, researcherId = ?, researcherName = ?, researchCategory = ?, researchDescription = ?, researchCost = ?, researchDuration = ?, startDate = ? WHERE researchID = ?";
+		
+		PreparedStatement statement = con.prepareStatement(insertSql);
+		
+		statement.setString(1, researchName);
+		statement.setInt(2, researcherId);
+		statement.setString(3, researcherName);
+		statement.setString(4, researchCategory);
+		statement.setString(5, researchDescription);
+		statement.setFloat(6, researchCost);
+		statement.setInt(7, researchDuration);
+		statement.setString(8, startDate);
+		statement.setInt(9, researchID);
+		
+		statement.execute();
+		con.close();
+		
+		output = "Updated Successfully";
+		
+	}catch(Exception e)
+	{
+		output = "Error while Updateding.";
+		System.out.print(e);
+	}
+	return output;
 	
 }
+
+public String deleteResearchProject(int researchID)
+{
+	String output = "";
 	
+	try 
+	{
+		Connection con = connect();
+		
+		if(con == null)
+		{
+			return "Error while connecting to the database for deleting";
+		}
+			String deleteSql = "DELETE FROM researchprojects_tb WHERE researchID = ? ";
+			
+			PreparedStatement statement = con.prepareStatement(deleteSql);
+			statement.setInt(1, researchID);
+			statement.executeUpdate();
+			con.close();
+			
+			output = "Deleted Successfully";
+			
+	}
+	catch(Exception e)
+	{
+		output = "Error while Deleting";
+		System.out.println(e);
+		
+	}
+	
+	return output;
+	
+}
+
 
 }

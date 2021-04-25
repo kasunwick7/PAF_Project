@@ -1,16 +1,18 @@
 package com;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 public class RequestValidator {
-	public static boolean validate(String key) {
+	public boolean validate(String key) {
 
 		// request validation
 
 		Client client;
-		String baseuri = "http://localhost:8080/authentication-service/API/requestvalidator";
+		String baseuri = "http://localhost:8081/authentication-service/API/requestvalidator";
 		ClientResponse response;
 		String output = null;
 
@@ -21,7 +23,8 @@ public class RequestValidator {
 			String input = "{key:" + key + "}";
 
 			// POST method
-			response = webResource.accept("application/json").type("application/json").post(ClientResponse.class,input);
+			response = webResource.accept("application/json").type("application/json").post(ClientResponse.class,
+					input);
 
 			// check response status code
 			if (response.getStatus() != 200) {
@@ -30,9 +33,16 @@ public class RequestValidator {
 
 			// response
 			output = response.getEntity(String.class);
-			System.out.print("-------------------------");
 			System.out.print(output);
-
+			try {
+				JsonObject productObject = new JsonParser().parse(output).getAsJsonObject();
+				String status = productObject.get("validation_status").getAsString();
+				if (status.equals("valid")) {
+					return true;
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -41,7 +51,7 @@ public class RequestValidator {
 
 		// end of validation
 
-		return true;
+		return false;
 	}
 
 }
