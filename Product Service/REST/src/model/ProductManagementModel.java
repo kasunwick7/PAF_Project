@@ -15,7 +15,7 @@ public class ProductManagementModel {
 		try
 		{
 			Class.forName("com.mysql.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/product_management_db", "root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/product_management_db", "paf_user", "^paf_user_pw_000");
 		}
 		catch (Exception e)
 		{
@@ -57,10 +57,42 @@ public class ProductManagementModel {
 		return true;
 	}
 	
+	public boolean addSold_products (int products_id, int buyer_id, String sold_date) {
+
+		try {
+
+			Connection con = connect();
+			
+			if (con == null) {
+				return false;
+			}
+			
+			// create a prepared statement
+			String query =  " insert into products_sold (`products_id`,`buyer_id`,`sold_date`) values (?, ?, ?)"; 
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			// binding values
+
+			
+			preparedStmt.setInt(1, products_id);
+			preparedStmt.setInt(2, buyer_id);
+			preparedStmt.setString(3, sold_date);
+	
+			preparedStmt.executeUpdate();
+
+		} catch (Exception e) {
+
+			System.err.println(e.getMessage());
+			return false;
+
+		}
+
+		return true;
+	}
+	
 	
 	public String readProducts() {
 		JsonObject products = new JsonObject();
-		System.out.println("aaaaa");
+		
 		try {
 
 			Connection con = connect();
