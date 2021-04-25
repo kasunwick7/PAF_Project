@@ -108,9 +108,10 @@ public class ProductManagementModel {
 			ResultSet rs = preparedStmt.executeQuery();
 
 			JsonArray array = new JsonArray();
-			JsonObject innerProducts= new JsonObject();
+			
 			while (rs.next()) {
-
+				
+				JsonObject innerProducts= new JsonObject();
 				innerProducts.addProperty("products_id", rs.getInt(1));
 				innerProducts.addProperty("research_id", rs.getInt(2));
 				innerProducts.addProperty("name", rs.getString(3));
@@ -152,9 +153,9 @@ public class ProductManagementModel {
 			ResultSet rs = preparedStmt.executeQuery();
 
 			JsonArray array = new JsonArray();
-			JsonObject innerProducts= new JsonObject();
+			
 			while (rs.next()) {
-
+				JsonObject innerProducts= new JsonObject();
 				innerProducts.addProperty("products_id", rs.getInt(1));
 				innerProducts.addProperty("buyer_id", rs.getInt(2));
 				innerProducts.addProperty("sold_date", rs.getString(3));
