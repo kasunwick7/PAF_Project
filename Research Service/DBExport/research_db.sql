@@ -33,7 +33,7 @@ CREATE TABLE `researchprojects_tb` (
   `researchDuration` varchar(10) DEFAULT NULL,
   `startDate` datetime DEFAULT NULL,
   PRIMARY KEY (`researchID`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,7 +42,7 @@ CREATE TABLE `researchprojects_tb` (
 
 LOCK TABLES `researchprojects_tb` WRITE;
 /*!40000 ALTER TABLE `researchprojects_tb` DISABLE KEYS */;
-INSERT INTO `researchprojects_tb` VALUES (8,'Solar Power Vehicle',105,'Nimal','Automobile','Fully Electric Solar Powered Bus',25000000,'730','2021-03-08 00:00:00'),(9,'Elephant Detection System',120,'Amal','Wildlife','Fully Automated Elephant',5000000,'182','2021-04-05 00:00:00'),(10,'Mobile Phone',115,'Amali','Device','Customizable Smart Phone',25000000,'730','2021-05-08 00:00:00'),(11,'Wide Monitor',125,'Sunil','Device','Eye Friendly Monitor',5200000,'364','2021-04-05 00:00:00'),(12,'Online Education Monitor',110,'Sunil','Software','Encylopedia',5200000,'364','2021-04-05 00:00:00'),(13,'Keyboard',1,'Nirman','Device','Water-Proof Keyboard',15000000,'720','2021-04-05 00:00:00');
+INSERT INTO `researchprojects_tb` VALUES (8,'Solar Power Vehicle',105,'Nimal','Automobile','Fully Electric Solar Powered Bus',25000000,'730','2021-03-08 00:00:00'),(9,'Elephant Detection System',120,'Amal','Wildlife','Fully Automated Elephant',5000000,'182','2021-04-05 00:00:00'),(10,'Mobile Phone',115,'Amali','Device','Customizable Smart Phone',25000000,'730','2021-05-08 00:00:00'),(11,'Wide Monitor',125,'Sunil','Device','Eye Friendly Monitor',5200000,'364','2021-04-05 00:00:00'),(12,'Online Exams',110,'Sunil.T','Software','Encylopedia',5200000,'364','2021-04-05 00:00:00'),(13,'Keyboard',1,'Nirman','Device','Water-Proof Keyboard',15000000,'720','2021-04-05 00:00:00'),(14,'Wildlife App',1,'Naveen','Wildlife','Wild Animal Warning',5000000,'182','2021-04-05 00:00:00'),(15,'Workout App',1,'Aravinda','Software','Online guiding App',5000000,'128','2021-06-08 00:00:00'),(16,'Traffic App',1,'Nirman','Device','Traffic Control App',15000000,'720','2021-07-05 00:00:00');
 /*!40000 ALTER TABLE `researchprojects_tb` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-25  0:34:10
+-- Dump completed on 2021-04-25 18:45:55
