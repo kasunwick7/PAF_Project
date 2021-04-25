@@ -13,6 +13,7 @@ import org.jsoup.nodes.Document;
 public class UserService
 {
  User user = new User();
+ RequestValidator requestValidator =  new RequestValidator();
 @GET
 @Path("/")
 @Consumes(MediaType.TEXT_PLAIN)
@@ -21,7 +22,7 @@ public class UserService
 public String ReadUsers(@DefaultValue("0") @QueryParam("user_id") Integer userID,
 		@DefaultValue("") @QueryParam("key") String key) {
 	// request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
@@ -50,14 +51,14 @@ public String insertUser(String data) {
 	try {
 		JsonObject userObject = new JsonParser().parse(data).getAsJsonObject();
 		// request validation
-		if (!RequestValidator.validate(userObject.get("key").getAsString())) {
+		if (!requestValidator.validate(userObject.get("key").getAsString())) {
 			return result.toString();
 		}
 		
 
 		if (userObject.has("MultipleUsers")) {
 
-			for (JsonElement singleUser : userObject.get("users").getAsJsonArray()) {
+			for (JsonElement singleUser : userObject.get("MultipleUsers").getAsJsonArray()) {
 				JsonObject userObj = singleUser.getAsJsonObject();
 				user_level = userObj.get("user_level").getAsInt();
 				email = userObj.get("email").getAsString();
@@ -71,7 +72,7 @@ public String insertUser(String data) {
 			}
 			result.addProperty("status", "done_all");
 
-		} else if (userObject.has("SingleUser")) {
+		} else {
 			user_level = userObject.get("user_level").getAsInt();
 			email = userObject.get("email").getAsString();
 			fname = userObject.get("fname").getAsString();
@@ -102,7 +103,7 @@ public String updateUser(String userData)
  JsonObject userObject = new JsonParser().parse(userData).getAsJsonObject();
  String key = userObject.get("key").getAsString();
 //request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
@@ -129,7 +130,7 @@ public String deleteUser(String data) {
 	JsonObject userObject = new JsonParser().parse(data).getAsJsonObject();
 	String key = userObject.get("key").getAsString();
 	// request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
@@ -146,7 +147,7 @@ public String deleteUser(String data) {
 public String getUserLevel(@DefaultValue("0") @QueryParam("user_id") Integer user,
 		@DefaultValue("") @QueryParam("key") String key) {
 	// request validation
-	if (!RequestValidator.validate(key)) {
+	if (!requestValidator.validate(key)) {
 		JsonObject result = new JsonObject();
 		result.addProperty("status", "error_unauthorized");
 		return result.toString();
