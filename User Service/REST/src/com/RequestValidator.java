@@ -23,8 +23,7 @@ public class RequestValidator {
 			String input = "{key:" + key + "}";
 
 			// POST method
-			response = webResource.accept("application/json").type("application/json").post(ClientResponse.class,
-					input);
+			response = webResource.accept("application/json").type("application/json").post(ClientResponse.class,input);
 
 			// check response status code
 			if (response.getStatus() != 200) {
@@ -35,14 +34,16 @@ public class RequestValidator {
 			output = response.getEntity(String.class);
 			System.out.print(output);
 			try {
-				JsonObject itemObject = new JsonParser().parse(output).getAsJsonObject();
-				String status = itemObject.get("status").getAsString();
+				JsonObject userObject = new JsonParser().parse(output).getAsJsonObject();
+				String status = userObject.get("validation_status").getAsString();
 				if (status.equals("valid")) {
 					return true;
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
+			
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -51,7 +52,7 @@ public class RequestValidator {
 
 		// end of validation
 
-		return false;
+		return true;
 	}
 
 }
